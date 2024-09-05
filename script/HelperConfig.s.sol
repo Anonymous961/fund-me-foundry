@@ -21,7 +21,7 @@ contract HelperConfig is Script {
         } else if (block.chainid == 1) {
             acitveNetworkConfig = getMainnetEthConfig();
         } else {
-            acitveNetworkConfig = getAnvilEthConfig();
+            acitveNetworkConfig = getOrCreateAnvilEthConfig();
         }
     }
 
@@ -39,7 +39,10 @@ contract HelperConfig is Script {
         return ethConfig;
     }
 
-    function getAnvilEthConfig() public returns (NetworkConfig memory) {
+    function getOrCreateAnvilEthConfig() public returns (NetworkConfig memory) {
+        if (acitveNetworkConfig.priceFeed != address(0)) {
+            return acitveNetworkConfig;
+        }
         vm.startBroadcast();
         MockV3Aggregator mockPriceFeed = new MockV3Aggregator(
             DECIMALS,
